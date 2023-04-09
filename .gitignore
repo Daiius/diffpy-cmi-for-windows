@@ -1,0 +1,10 @@
+/.venv/
+/boost*/
+/dlfcn-win32/
+/gsl/
+/libdiffpy/
+/libobjcryst/
+
+output.txt
+
+*.zip
