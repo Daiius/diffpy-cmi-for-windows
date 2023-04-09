@@ -32,7 +32,7 @@ if ($buildBoost) {
     # TODO static build gives different name?
     .\b2.exe --prefix=. `
         --layout=system --with-serialization `
-        link=dynamic threading=multi variant=release address-model=64
+        link=shared threading=multi variant=release address-model=64
     #Copy-Item -Path ".\stage\lib\libboost_serialization.lib" -Destination ".\stage\lib\boost_serialization.lib"
     Set-Location $rootDir
     $boostIncludePath="$($rootDir)\$($boostDirName)\"
