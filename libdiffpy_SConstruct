@@ -97,7 +97,7 @@ if env['profile']:  btags.append('profile')
 builddir = env.Dir('build/' + '-'.join(btags))
 
 
-env.Append(CXXFLAGS=["/D_USE_MATH_DEFINES", "/DWIN32", "/std:c++17", "/O2", "/EHsc", "/MT"])
+env.Append(CXXFLAGS=["/D_USE_MATH_DEFINES", "/DWIN32", "/std:c++17", "/O2", "/EHsc", "/MT", "/DBOOST_ALL_NO_LIB"])
 print(env['CXXFLAGS'])
 Export('env')
 

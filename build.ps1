@@ -11,7 +11,7 @@ $boostSourceZipUrl="https://sourceforge.net/projects/boost/files/boost/$($boostV
 
 # not sure for scons output dir path.
 # maybe need to change this.
-$libobjcrystBuildDir="build\fast-AMD64"
+$sconsBuildDir="build\fast-AMD64"
 
 if ($buildBoost) {
     Write-Output "Installing boost..."
@@ -32,8 +32,8 @@ if ($buildBoost) {
     # TODO static build gives different name?
     .\b2.exe --prefix=. `
         --layout=system --with-serialization `
-        link=shared threading=multi variant=release address-model=64
-    #Copy-Item -Path ".\stage\lib\libboost_serialization.lib" -Destination ".\stage\lib\boost_serialization.lib"
+        link=shared threading=multi variant=release address-model=64 runtime-link=shared
+    Copy-Item -Path ".\stage\lib\libboost_serialization.lib" -Destination ".\stage\lib\boost_serialization.lib"
     Set-Location $rootDir
     $boostIncludePath="$($rootDir)\$($boostDirName)\"
     Write-Output "Adding $($boostIncludePath) to env:INCLUDE..."
@@ -59,13 +59,15 @@ Copy-Item -Path ".\libobjcryst_SConstruct" -Destination ".\libobjcryst\SConstruc
 Copy-Item -Path ".\libobjcryst_src_SConscript" -Destination ".\libobjcryst\src\SConscript"
 Set-Location .\libobjcryst
 $env:PREFIX="."
+#scons -j8 build
+#Move-Item ".\build\fast-AMD64\libObjCryst.lib" ".\build\fast-AMD64\ObjCryst.lib"
 scons -j8 install
 Set-Location $rootDir
-$libobjcrystIncludePath="$($rootDir)\libobjcryst\$($libobjcrystBuildDir)\"
+$libobjcrystIncludePath="$($rootDir)\libobjcryst\$($sconsBuildDir)\"
 if (-Not( $env:INCLUDE -split ";" -contains $libobjcrystIncludePath )) {
     $env:INCLUDE+=";$($libobjcrystIncludePath)"
 }
-$libobjcrystLibraryPath="$($rootDir)\libobjcryst\$($libobjcrystBuildDir)\"
+$libobjcrystLibraryPath="$($rootDir)\libobjcryst\$($sconsBuildDir)\"
 if (-Not( $env:LIB-split ";" -contains $libobjcrystLibraryPath )) {
     $env:LIB+=";$($libobjcrystLibraryPath)"
 }
@@ -117,7 +119,20 @@ Copy-Item .\libdiffpy_src_diffpy_runtimepath.cpp .\libdiffpy\src\diffpy\runtimep
 Copy-Item .\libdiffpy_src_diffpy_srreal_scatteringfactordata.cpp .\libdiffpy\src\diffpy\srreal\scatteringfactordata.cpp
 
 Set-Location ./libdiffpy
-rm -Force -Recurse build
-scons -j8 build 
+scons -j8 install
+
+$libdiffpyIncludePath="$($rootDir)\libdiffpy\$($sconsBuildDir)\include\"
+if (-Not($env:INCLUDE -contains $libdiffpyIncludePath)) {
+    $env:INCLUDE+=";$($libdiffpyIncludePath)"
+}
+$libdiffpyLibraryPath="$($rootDir)\libdiffpy\$($sconsBuildDir)\lib\"
+if (-Not($env:LIB -contains $libdiffpyLibraryPath)) {
+    $env:LIB+=";$($libdiffpyLibraryPath)"
+}
+
+Set-Location examples
+
+cl.exe /EHsc /DBOOST_ALL_NO_LIB /MT /O2 testlib.cpp diffpy.lib boost_serialization.lib
+.\testlib.exe
 
 Set-Location $rootDir

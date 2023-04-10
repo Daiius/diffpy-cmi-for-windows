@@ -84,7 +84,11 @@ if platform.system().lower() == "windows":
     # Use a static library (does not require __declspec(dllexport) all over the code)
     #libobjcryst = env.StaticLibrary("ObjCryst",
     #                                objcrystobjs + cctbxobjs + newmatobjs)
-    libobjcryst = env.SharedLibrary("ObjCryst",
+    #
+    # I don't understand comment above...
+    # it is hard to use same compile flags between different repository.
+    # Dynamic link library is also a good choice.
+    libobjcryst = env.SharedLibrary(["ObjCryst.dll", "ObjCryst.lib"],
                                     objcrystobjs + cctbxobjs + newmatobjs)
 else:
     libobjcryst = env.SharedLibrary("ObjCryst",
