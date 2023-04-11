@@ -115,6 +115,8 @@ const string& diffpyruntime()
         return envrt;
     }
     if (did_librt)  return librt;
+    #ifdef _MSC_VER
+    #else
     // here we need to resolve path of the libdiffpy shared library
     Dl_info i;
     dladdr(reinterpret_cast<void*>(diffpyruntime), &i);
@@ -137,8 +139,10 @@ const string& diffpyruntime()
         did_librt = true;
         return librt;
     }
+
     // nothing worked - throw exception about the first candidate path.
     ensureIsDir(d1);
+    #endif
     return librt;
 }
 
