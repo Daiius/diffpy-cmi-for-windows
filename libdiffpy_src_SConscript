@@ -136,7 +136,10 @@ else:
 # The dladdr call in runtimepath.cpp requires the dl library.
 env_lib.AppendUnique(LIBS=['dl'])
 
-libdiffpy = env_lib.SharedLibrary('diffpy', env['lib_sources'])
+if os.name == "nt":
+    libdiffpy = env_lib.StaticLibrary('diffpy', env['lib_sources'])
+else:
+    libdiffpy = env_lib.SharedLibrary('diffpy', env['lib_sources'])
 # Clean up .gcda and .gcno files from coverage analysis.
 env_lib.Clean(libdiffpy, Glob('diffpy/*.gc??'))
 env_lib.Clean(libdiffpy, Glob('diffpy/srreal/*.gc??'))
